@@ -47,5 +47,3 @@ async function storePair(original: string, random: string) {
 
   return await linksCollection.insertOne(link);
 }
-
-// mongo: k102, qBY3vZTegzWeLp9

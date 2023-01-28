@@ -15,7 +15,7 @@ export default async function handler(
     return;
   }
 
-  const { link } = JSON.parse(req.body);
+  const { link, preventRecord } = JSON.parse(req.body);
 
   if (!/^[a-f0-9]{32}$/.test(link)) {
     res.status(400);
@@ -24,14 +24,14 @@ export default async function handler(
 
   const storedLink = await getLink(link);
 
-  console.info(storedLink);
-
   if (!storedLink) {
     res.status(404);
     return;
   }
 
-  await recordClick(link);
+  if (!preventRecord) {
+    await recordClick(link);
+  }
   res.status(200).json({ data: storedLink });
 }
 

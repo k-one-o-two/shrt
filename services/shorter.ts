@@ -10,11 +10,12 @@ export const shorterService = {
     return await response.json();
   },
 
-  unshort: async (link: string) => {
+  unshort: async (link: string, preventRecord?: boolean) => {
     const response = await fetch('/api/unshort', {
       method: 'POST',
       body: JSON.stringify({
         link,
+        preventRecord,
       }),
     });
 
