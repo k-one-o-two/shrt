@@ -7,6 +7,10 @@ export const shorterService = {
       }),
     });
 
+    if (response.status !== 200) {
+      return null;
+    }
+
     return await response.json();
   },
 
@@ -18,6 +22,10 @@ export const shorterService = {
         preventRecord,
       }),
     });
+
+    if (response.status !== 200) {
+      return null;
+    }
 
     return await response.json();
   },

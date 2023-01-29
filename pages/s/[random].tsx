@@ -13,25 +13,19 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Button from '@mui/material/Button';
 import { DeleteDialog } from '@/components/deleteDialog';
+import { StatItem } from 'types';
 
 function LinkStat() {
   const router = useRouter();
   const { random } = router.query;
 
   const [original, setOriginal] = useState<string>('');
-  const [statistics, setStatistics] = useState<
-    {
-      clicks: number;
-      random: string;
-      utcDate: string;
-      _id: string;
-    }[]
-  >([]);
+  const [statistics, setStatistics] = useState<StatItem[]>([]);
 
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
 
   const getStoredLink = useCallback(async (random: string) => {
-    const unshortResponse: any = await shorterService.unshort(random, true);
+    const unshortResponse = await shorterService.unshort(random, true);
 
     if (unshortResponse.data && unshortResponse.data.original) {
       setOriginal(unshortResponse.data.original);
@@ -55,14 +49,12 @@ function LinkStat() {
 
   const deleteLink = useCallback(
     async (confirmed: boolean) => {
-      console.info({ confirmed });
       setShowDeleteDialog(false);
       if (!confirmed) {
         return;
       }
 
       await statService.deleteLink(random as string);
-      console.info('replace');
       router.replace('/');
     },
     [random, router],

@@ -8,6 +8,10 @@ export const statService = {
       }),
     });
 
+    if (response.status !== 200) {
+      return null;
+    }
+
     return await response.json();
   },
 
@@ -18,6 +22,10 @@ export const statService = {
         random,
       }),
     });
+
+    if (response.status !== 200) {
+      return null;
+    }
 
     return await response.json();
   },

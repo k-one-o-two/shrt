@@ -1,17 +1,18 @@
-import { MongoClient, ServerApiVersion } from 'mongodb';
+import { MongoClient } from 'mongodb';
+require('dotenv').config();
+
 export const mongoService = {
   connect: async () => {
-    const uri =
-      'mongodb+srv://k102:qBY3vZTegzWeLp9@cluster0.dzt8im3.mongodb.net/?retryWrites=true&w=majority';
+    const uri = process.env.MONGO_URI || '';
     const client = new MongoClient(uri);
-    await client.connect;
+    await client.connect();
 
-    const db = client.db('shrt');
+    const db = client.db(process.env.MONGO_DB);
 
     return {
-      links: db.collection('links'),
-      clicks: db.collection('clicks'),
-      close: client.close,
+      links: db.collection(process.env.MONGO_LINKS_COLLECTION || ''),
+      clicks: db.collection(process.env.MONGO_CLICKS_COLLECTION || ''),
+      close: () => client.close(true),
     };
   },
 };

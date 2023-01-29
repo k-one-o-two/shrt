@@ -1,22 +1,20 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { randomBytes } from 'crypto';
 import { mongoService } from '@/services/mongo';
-
-type Resp = {
-  generated: string;
-};
-
-type Link = {
-  original: string;
-  random: string;
-};
+import { Link } from 'types';
+require('dotenv').config();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Resp>,
+  res: NextApiResponse<
+    | {
+        generated: string;
+      }
+    | string
+  >,
 ) {
   if (req.method !== 'POST' || !req.body) {
-    res.status(400);
+    res.status(400).send('bad request');
     return;
   }
 
@@ -29,7 +27,7 @@ export default async function handler(
 }
 
 async function generateRandomString() {
-  const bytes = randomBytes(16);
+  const bytes = randomBytes(Number(process.env.RANDOM_LENGTH) || 0);
   const string = bytes.toString('hex');
 
   return string;
@@ -44,7 +42,7 @@ async function storePair(original: string, random: string) {
   };
 
   await links.insertOne(link);
-  close();
+  await close();
 
   return;
 }

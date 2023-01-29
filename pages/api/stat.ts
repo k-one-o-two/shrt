@@ -1,12 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { mongoService } from '@/services/mongo';
+import { StatItem } from 'types';
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>,
+  res: NextApiResponse<{ stat: StatItem[] } | string>,
 ) {
   if (req.method !== 'POST' || !req.body) {
-    res.status(400);
+    res.status(400).send('bad request');
     return;
   }
 
@@ -20,9 +21,9 @@ async function getStat(random: string) {
   const { clicks, close } = await mongoService.connect();
   const clicksStat = clicks.find({ random });
 
-  const array = await clicksStat.toArray();
+  const array = (await clicksStat.toArray()) as StatItem[];
 
-  close();
+  await close();
 
   return array;
 }

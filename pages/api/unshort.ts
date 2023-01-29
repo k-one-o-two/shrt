@@ -1,31 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { mongoService } from '@/services/mongo';
-
-type Link = {
-  original: string;
-  random: string;
-};
+import { Link } from 'types';
+require('dotenv').config();
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<any>,
+  res: NextApiResponse<{ data: Link } | string>,
 ) {
   if (req.method !== 'POST' || !req.body) {
-    res.status(400);
+    res.status(400).send('bad request');
     return;
   }
 
   const { link, preventRecord } = JSON.parse(req.body);
 
-  if (!/^[a-f0-9]{32}$/.test(link)) {
-    res.status(400);
+  const ransomStrLength = Number(process.env.RANDOM_LENGTH) * 2;
+
+  const linkTestReg = new RegExp(`^[a-f0-9]{${ransomStrLength}}$`);
+
+  if (!linkTestReg.test(link)) {
+    res.status(400).send('bad request');
     return;
   }
 
   const storedLink = await getLink(link);
 
   if (!storedLink) {
-    res.status(404);
+    res.status(404).send('not found');
     return;
   }
 
@@ -35,19 +36,19 @@ export default async function handler(
   res.status(200).json({ data: storedLink });
 }
 
-async function getLink(random: string) {
+async function getLink(random: string): Promise<Link> {
   const { links, close } = await mongoService.connect();
 
-  const link = await links.findOne({
+  const link = (await links.findOne({
     random,
-  });
+  })) as Link;
 
-  close();
+  await close();
 
   return link;
 }
 
-async function recordClick(random: string) {
+async function recordClick(random: string): Promise<void> {
   const { clicks, close } = await mongoService.connect();
 
   const now = new Date();
@@ -68,7 +69,7 @@ async function recordClick(random: string) {
     },
   );
 
-  close();
+  await close();
 
   return;
 }
