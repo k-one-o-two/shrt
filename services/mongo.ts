@@ -7,7 +7,10 @@ export const mongoService = {
     console.time('connect');
     const uri = process.env.MONGO_URI || '';
     const client = new MongoClient(uri);
-    await client.connect();
+    console.log(client);
+
+    const connection = await client.connect();
+    console.log(connection);
 
     const db = client.db(process.env.MONGO_DB);
 
