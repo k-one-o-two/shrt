@@ -11,18 +11,17 @@ export default async function handler(
   }
 
   const { random } = JSON.parse(req.body);
-  const stat = await getStat(random);
-
-  res.status(200).json({ stat });
+  await deleteLink(random);
+  res.status(200).send('ok');
 }
 
-async function getStat(random: string) {
-  const { clicks, close } = await mongoService.connect();
-  const clicksStat = clicks.find({ random });
+async function deleteLink(random: string) {
+  const { clicks, links, close } = await mongoService.connect();
 
-  const array = await clicksStat.toArray();
+  await clicks.deleteMany({ random });
+  await links.deleteMany({ random });
 
   close();
 
-  return array;
+  return;
 }

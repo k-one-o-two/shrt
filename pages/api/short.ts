@@ -29,21 +29,22 @@ export default async function handler(
 }
 
 async function generateRandomString() {
-  const bytes = await randomBytes(16);
+  const bytes = randomBytes(16);
   const string = bytes.toString('hex');
 
   return string;
 }
 
 async function storePair(original: string, random: string) {
-  const client = await mongoService.connect();
-
-  const linksCollection = client.db('shrt').collection('links');
+  const { links, close } = await mongoService.connect();
 
   const link: Link = {
     original,
     random,
   };
 
-  return await linksCollection.insertOne(link);
+  await links.insertOne(link);
+  close();
+
+  return;
 }

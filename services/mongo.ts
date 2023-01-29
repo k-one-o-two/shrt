@@ -6,6 +6,12 @@ export const mongoService = {
     const client = new MongoClient(uri);
     await client.connect;
 
-    return client;
+    const db = client.db('shrt');
+
+    return {
+      links: db.collection('links'),
+      clicks: db.collection('clicks'),
+      close: client.close,
+    };
   },
 };

@@ -36,22 +36,39 @@ export default async function handler(
 }
 
 async function getLink(random: string) {
-  const client = await mongoService.connect();
+  const { links, close } = await mongoService.connect();
 
-  const linksCollection = client.db('shrt').collection('links');
-
-  return await linksCollection.findOne({
+  const link = await links.findOne({
     random,
   });
+
+  close();
+
+  return link;
 }
 
 async function recordClick(random: string) {
-  const client = await mongoService.connect();
+  const { clicks, close } = await mongoService.connect();
 
-  const clicksCollection = client.db('shrt').collection('clicks');
+  const now = new Date();
+  const utcDate = `${now.getUTCFullYear()}-${
+    now.getUTCMonth() + 1
+  }-${now.getUTCDate()}`;
 
-  return clicksCollection.insertOne({
-    random,
-    timestamp: new Date(),
-  });
+  await clicks.findOneAndUpdate(
+    {
+      random,
+      utcDate,
+    },
+    {
+      $inc: { clicks: 1 },
+    },
+    {
+      upsert: true,
+    },
+  );
+
+  close();
+
+  return;
 }
