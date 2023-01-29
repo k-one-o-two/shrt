@@ -3,6 +3,7 @@ require('dotenv').config();
 
 export const mongoService = {
   connect: async () => {
+    console.log('connection starting', process.env.MONGO_URI);
     const uri = process.env.MONGO_URI || '';
     const client = new MongoClient(uri);
     await client.connect();
