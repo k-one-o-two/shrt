@@ -13,20 +13,29 @@ export default async function handler(
     | string
   >,
 ) {
+  console.log('entered');
+  console.time('short');
+
   if (req.method !== 'POST' || !req.body) {
     res.status(400).send('bad request');
     return;
   }
 
   const { url } = JSON.parse(req.body);
-  const randomString = await generateRandomString();
+  const randomString = generateRandomString();
+
+  console.log('generated');
 
   await storePair(url, randomString);
 
+  console.log('stored');
+
   res.status(200).json({ generated: randomString });
+
+  console.timeEnd('short');
 }
 
-async function generateRandomString() {
+function generateRandomString() {
   const bytes = randomBytes(Number(process.env.RANDOM_LENGTH) || 0);
   const string = bytes.toString('hex');
 
