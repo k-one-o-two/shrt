@@ -43,6 +43,7 @@ function generateRandomString() {
 }
 
 async function storePair(original: string, random: string) {
+  console.time('store');
   const { links, close } = await mongoService.connect();
 
   const link: Link = {
@@ -52,6 +53,6 @@ async function storePair(original: string, random: string) {
 
   await links.insertOne(link);
   await close();
-
+  console.timeEnd('store');
   return;
 }
